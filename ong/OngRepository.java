@@ -1,0 +1,26 @@
+
+package io.github.go.gerenciamento_adocoes.ong;
+
+import java.util.List;
+import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import io.github.go.gerenciamento_adocoes.ong.model.OngEntity;
+
+public interface OngRepository extends JpaRepository<OngEntity, Long> {
+
+    Optional<OngEntity> findByName(String name);
+
+    @Query("""
+            SELECT c
+            FROM OngEntity c
+            WHERE (:id IS NULL OR c.id <> :id)
+            AND c.name = :name
+            """)
+    List<OngEntity> findByNameAndNotId(
+            @Param("name") String name,
+            @Param("id") Long id
+    );
+}
