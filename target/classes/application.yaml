@@ -1,0 +1,10 @@
+spring:
+  profiles:
+    active: test
+  flyway:
+    baseline-on-migrate: true
+    baseline-version: 0
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 30MB
