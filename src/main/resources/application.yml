@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: test
+    active: prod
   flyway:
     baseline-on-migrate: true
     baseline-version: 0
