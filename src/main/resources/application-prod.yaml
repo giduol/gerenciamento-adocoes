@@ -1,4 +1,6 @@
 spring:
+  main:
+    lazy-initialization: true
   datasource:
     url: jdbc:postgresql://primary.giovanni-order-db--cj6ybc4ywxr4.addon.code.run:27980/_7c83580aabd1?user=_696e6f083591ea91&password=_5f5034355fa1b6f030e3550ca1437b&sslmode=require
     username: _696e6f083591ea91
