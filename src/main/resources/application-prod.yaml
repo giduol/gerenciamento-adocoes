@@ -1,5 +1,4 @@
 spring:
-
   datasource:
     url: jdbc:postgresql://primary.giovanni-order-db--cj6ybc4ywxr4.addon.code.run:27980/_7c83580aabd1?user=_696e6f083591ea91&password=_5f5034355fa1b6f030e3550ca1437b&sslmode=require
     username: _696e6f083591ea91
@@ -25,3 +24,12 @@ spring:
 jwt:
   secret: MYSECRET
   expiration: 3600000
+
+server:
+  port: ${PORT:8080}
+  tomcat:
+    threads:
+      max: 10
+      min-spare: 2
+    max-connections: 30
+    accept-count: 10
