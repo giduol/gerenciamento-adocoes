@@ -10,10 +10,13 @@ import io.github.go.gerenciamento_adocoes.acompanhamento.model.AcompanhamentoEnt
 
 public interface AcompanhamentoRepository extends JpaRepository<AcompanhamentoEntity, Long> {
 
-    @EntityGraph(attributePaths = {"adoption", "adoption.animal", "adoption.adotante"})
+    @EntityGraph(attributePaths = {"adoption", "adoption.ong", "adoption.animal", "adoption.adotante"})
     List<AcompanhamentoEntity> findByAdoptionIdOrderByPerformedAtAsc(Long adocaoId);
 
+    @EntityGraph(attributePaths = {"adoption", "adoption.ong", "adoption.animal", "adoption.adotante"})
+    List<AcompanhamentoEntity> findByAdoptionAdotanteCpfOrderByPerformedAtAsc(String cpf);
+
     @Override
-    @EntityGraph(attributePaths = {"adoption", "adoption.animal", "adoption.adotante"})
+    @EntityGraph(attributePaths = {"adoption", "adoption.ong", "adoption.animal", "adoption.adotante"})
     Optional<AcompanhamentoEntity> findById(Long id);
 }

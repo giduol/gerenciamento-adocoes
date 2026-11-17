@@ -12,11 +12,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import io.github.go.gerenciamento_adocoes.acompanhamento.dto.AcompanhamentoDetalhes;
+import io.github.go.gerenciamento_adocoes.acompanhamento.dto.AcompanhamentoComAdocaoDetalhes;
 import io.github.go.gerenciamento_adocoes.acompanhamento.dto.AcompanhamentoForm;
 import io.github.go.gerenciamento_adocoes.acompanhamento.mapper.AcompanhamentoMapper;
 import io.github.go.gerenciamento_adocoes.acompanhamento.model.AcompanhamentoEntity;
 import io.github.go.gerenciamento_adocoes.acompanhamento.model.StoredMediaFile;
 import io.github.go.gerenciamento_adocoes.acompanhamento.persistence.MeiosAcompanhamentoConverter;
+import io.github.go.gerenciamento_adocoes.adocao.mapper.AdocaoMapper;
 import io.github.go.gerenciamento_adocoes.common.exceptions.ResourceNotFoundException;
 import io.github.go.gerenciamento_adocoes.common.exceptions.ValidationException;
 import io.github.go.gerenciamento_adocoes.adocao.AdocaoRepository;
@@ -29,6 +31,7 @@ public class AcompanhamentoService {
     private final AcompanhamentoRepository repository;
     private final AdocaoRepository adocaoRepository;
     private final AcompanhamentoMapper mapper;
+    private final AdocaoMapper adocaoMapper;
     private final AcompanhamentoValidator validator;
     private final MeiosAcompanhamentoConverter meiosConverter;
     private final ObjectMapper objectMapper;
@@ -37,6 +40,7 @@ public class AcompanhamentoService {
             AcompanhamentoRepository repository,
             AdocaoRepository adocaoRepository,
             AcompanhamentoMapper mapper,
+            AdocaoMapper adocaoMapper,
             AcompanhamentoValidator validator,
             MeiosAcompanhamentoConverter meiosConverter,
             ObjectMapper objectMapper
@@ -44,6 +48,7 @@ public class AcompanhamentoService {
         this.repository = repository;
         this.adocaoRepository = adocaoRepository;
         this.mapper = mapper;
+        this.adocaoMapper = adocaoMapper;
         this.validator = validator;
         this.meiosConverter = meiosConverter;
         this.objectMapper = objectMapper;
@@ -57,6 +62,17 @@ public class AcompanhamentoService {
         return repository.findByAdoptionIdOrderByPerformedAtAsc(adocaoId)
                 .stream()
                 .map(mapper::toDetalhes)
+                .toList();
+    }
+
+    @Transactional
+    public List<AcompanhamentoComAdocaoDetalhes> listarPorCpfAdotante(String cpf) {
+        return repository.findByAdoptionAdotanteCpfOrderByPerformedAtAsc(cpf)
+                .stream()
+                .map(entity -> new AcompanhamentoComAdocaoDetalhes(
+                        mapper.toDetalhes(entity),
+                        adocaoMapper.toDetalhes(entity.getAdoption())
+                ))
                 .toList();
     }
 
