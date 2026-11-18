@@ -8,9 +8,9 @@ spring:
     virtual:
       enabled: true
   datasource:
-    url: jdbc:postgresql://primary.giovanni-order-db--cj6ybc4ywxr4.addon.code.run:27980/_7c83580aabd1?user=_696e6f083591ea91&password=_5f5034355fa1b6f030e3550ca1437b&sslmode=require
-    username: _696e6f083591ea91
-    password: _5f5034355fa1b6f030e3550ca1437b
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     hikari:
       maximum-pool-size: 2
       minimum-idle: 1
@@ -30,7 +30,7 @@ spring:
     open-in-view: false
 
 jwt:
-  secret: MYSECRET
+  secret: ${JWT_SECRET}
   expiration: 3600000
 
 server:

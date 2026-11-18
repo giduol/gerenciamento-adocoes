@@ -1,4 +1,8 @@
 spring:
+  config:
+    # Lê variáveis locais de um .env na raiz (ignorado pelo git).
+    # Em produção o arquivo não existe e os valores vêm do Northflank.
+    import: optional:file:.env[.properties]
   profiles:
     active: prod
   flyway:
