@@ -1,6 +1,12 @@
 spring:
   main:
     lazy-initialization: true
+    banner-mode: off
+  jmx:
+    enabled: false
+  threads:
+    virtual:
+      enabled: true
   datasource:
     url: jdbc:postgresql://primary.giovanni-order-db--cj6ybc4ywxr4.addon.code.run:27980/_7c83580aabd1?user=_696e6f083591ea91&password=_5f5034355fa1b6f030e3550ca1437b&sslmode=require
     username: _696e6f083591ea91
@@ -35,3 +41,11 @@ server:
       min-spare: 2
     max-connections: 30
     accept-count: 10
+
+# Swagger desligado em produção para economizar memória.
+# Para reativar, defina SWAGGER_ENABLED=true no Northflank.
+springdoc:
+  api-docs:
+    enabled: ${SWAGGER_ENABLED:false}
+  swagger-ui:
+    enabled: ${SWAGGER_ENABLED:false}
