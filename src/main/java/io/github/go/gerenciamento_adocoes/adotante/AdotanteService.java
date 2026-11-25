@@ -7,6 +7,8 @@ import io.github.go.gerenciamento_adocoes.adotante.dto.AdotanteDetalhes;
 import io.github.go.gerenciamento_adocoes.adotante.dto.AdotanteForm;
 import io.github.go.gerenciamento_adocoes.adotante.mapper.AdotanteMapper;
 import io.github.go.gerenciamento_adocoes.adotante.model.AdotanteEntity;
+import io.github.go.gerenciamento_adocoes.adocao.AdocaoRepository;
+import io.github.go.gerenciamento_adocoes.common.exceptions.DatabaseException;
 import io.github.go.gerenciamento_adocoes.common.exceptions.ResourceNotFoundException;
 import io.github.go.gerenciamento_adocoes.common.exceptions.ValidationException;
 import jakarta.transaction.Transactional;
@@ -22,6 +24,9 @@ public class AdotanteService {
 
     @Autowired
     private AdotanteMapper mapper;
+
+    @Autowired
+    private AdocaoRepository adocaoRepository;
 
     public AdotanteDetalhes criar(AdotanteForm form){
         var result = validator.validar(form, null);
@@ -58,5 +63,16 @@ public class AdotanteService {
             throw new ValidationException(result.getCamposInvalidos());
         }
         mapper.updateEntity(entity, adotanteAtualizado);
+    }
+
+    @Transactional
+    public void excluir(Long id){
+        if(!repository.existsById(id)) {
+            throw new ResourceNotFoundException();
+        }
+        if(adocaoRepository.existsByAdotanteId(id)) {
+            throw new DatabaseException("Não é possível excluir: existem adoções vinculadas a este adotante.");
+        }
+        repository.deleteById(id);
     }
 }

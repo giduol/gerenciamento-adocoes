@@ -22,6 +22,12 @@ public interface AdocaoRepository extends JpaRepository<AdocaoEntity, Long> {
 
     List<AdocaoEntity> findByOngId(Long ongId);
 
+    boolean existsByOngId(Long ongId);
+
+    boolean existsByAnimalId(Long animalId);
+
+    boolean existsByAdotanteId(Long adotanteId);
+
     List<AdocaoEntity> findByStatus(AdoptionStatus status);
 
     @Query("""

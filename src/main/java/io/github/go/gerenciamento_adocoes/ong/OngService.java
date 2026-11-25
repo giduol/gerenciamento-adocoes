@@ -7,6 +7,8 @@ import io.github.go.gerenciamento_adocoes.ong.dto.OngDetalhes;
 import io.github.go.gerenciamento_adocoes.ong.dto.OngForm;
 import io.github.go.gerenciamento_adocoes.ong.mapper.OngMapper;
 import io.github.go.gerenciamento_adocoes.ong.model.OngEntity;
+import io.github.go.gerenciamento_adocoes.adocao.AdocaoRepository;
+import io.github.go.gerenciamento_adocoes.common.exceptions.DatabaseException;
 import io.github.go.gerenciamento_adocoes.common.exceptions.ResourceNotFoundException;
 import io.github.go.gerenciamento_adocoes.common.exceptions.ValidationException;
 import jakarta.transaction.Transactional;
@@ -22,6 +24,9 @@ public class OngService {
 
     @Autowired
     private OngMapper mapper;
+
+    @Autowired
+    private AdocaoRepository adocaoRepository;
 
     public OngDetalhes criar(OngForm form){
         var result = validator.validar(form, null);
@@ -58,5 +63,16 @@ public class OngService {
             throw new ValidationException(result.getCamposInvalidos());
         }
         mapper.updateEntity(entity, ongAtualizado);
+    }
+
+    @Transactional
+    public void excluir(Long id){
+        if(!repository.existsById(id)) {
+            throw new ResourceNotFoundException();
+        }
+        if(adocaoRepository.existsByOngId(id)) {
+            throw new DatabaseException("Não é possível excluir: existem adoções vinculadas a esta ong.");
+        }
+        repository.deleteById(id);
     }
 }

@@ -132,6 +132,14 @@ public class AcompanhamentoService {
         );
     }
 
+    @Transactional
+    public void excluir(Long id) {
+        if (!repository.existsById(id)) {
+            throw new ResourceNotFoundException();
+        }
+        repository.deleteById(id);
+    }
+
     private JsonNode serializeFiles(List<MultipartFile> files) {
         var storedFiles = new ArrayList<StoredMediaFile>(files.size());
         for (var file : files) {

@@ -4,6 +4,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -62,6 +63,16 @@ public class AnimalController {
     )
     public ResponseEntity<AnimalDetalhes> atualizar(@PathVariable Long id, @RequestBody @Valid AnimalForm animalAtualizado){
         service.atualizar(id, animalAtualizado);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("{id}")
+    @Operation(
+            summary = "Excluir animal",
+            description = "Exclui um animal sem adoções vinculadas"
+    )
+    public ResponseEntity<Void> excluir(@PathVariable Long id){
+        service.excluir(id);
         return ResponseEntity.noContent().build();
     }
 }

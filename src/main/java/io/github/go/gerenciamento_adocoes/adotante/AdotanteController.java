@@ -4,6 +4,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -63,6 +64,16 @@ public class AdotanteController {
     )
     public ResponseEntity<AdotanteDetalhes> atualizar(@PathVariable Long id, @RequestBody @Valid AdotanteForm adotanteAtualizado){
         service.atualizar(id, adotanteAtualizado);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("{id}")
+    @Operation(
+            summary = "Excluir adotante",
+            description = "Exclui um adotante sem adoções vinculadas"
+    )
+    public ResponseEntity<Void> excluir(@PathVariable Long id){
+        service.excluir(id);
         return ResponseEntity.noContent().build();
     }
 }
