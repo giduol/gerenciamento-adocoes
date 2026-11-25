@@ -23,7 +23,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import io.github.go.gerenciamento_adocoes.adocao.dto.AdocaoDetalhes;
 import io.github.go.gerenciamento_adocoes.adocao.dto.AdocaoForm;
+import io.github.go.gerenciamento_adocoes.common.pagination.Paginacao;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
@@ -61,12 +64,15 @@ public class AdocaoController {
 
     @GetMapping
     @Operation(
-            summary = "Listar todos as adoções",
-            description = "Retorna a lista de todas as adoções cadastradas"
+            summary = "Listar as adoções",
+            description = "Retorna todas as adoções cadastradas ou, com page/size, uma página delas"
     )
-    public ResponseEntity<List<AdocaoDetalhes>> listarTodos(){
-        List<AdocaoDetalhes> adotantes = service.listarTodos();
-        return ResponseEntity.ok(adotantes);
+    @ApiResponse(responseCode = "200", description = Paginacao.DESCRICAO_RESPOSTA)
+    public ResponseEntity<?> listarTodos(
+            @Parameter(description = Paginacao.DESCRICAO_PAGE) @RequestParam(required = false) Integer page,
+            @Parameter(description = Paginacao.DESCRICAO_SIZE) @RequestParam(required = false) Integer size
+    ){
+        return Paginacao.responder(page, size, service::listarPagina, service::listarTodos);
     }
 
     @GetMapping("{id}")
@@ -102,20 +108,18 @@ public class AdocaoController {
             description = "Atualiza os dados de uma adoção específica"
     )
     public ResponseEntity<AdocaoDetalhes> atualizar(@PathVariable Long id, @RequestBody @Valid AdocaoForm adotanteAtualizado){
-        service.atualizar(id, adotanteAtualizado);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(service.atualizar(id, adotanteAtualizado));
     }
 
     @PutMapping(value = "{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Update an adoption and optionally replace its PDF document")
-    public ResponseEntity<Void> atualizarComDocumento(
+    public ResponseEntity<AdocaoDetalhes> atualizarComDocumento(
             @PathVariable Long id,
             @RequestParam("data") String data,
             @RequestParam(value = "document", required = false) MultipartFile document,
             @RequestParam(value = "media", required = false) MultipartFile media
     ) {
-        service.atualizar(id, parseForm(data), selectDocument(document, media));
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(service.atualizar(id, parseForm(data), selectDocument(document, media)));
     }
 
     @DeleteMapping("{id}")

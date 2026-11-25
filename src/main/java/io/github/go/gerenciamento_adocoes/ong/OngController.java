@@ -1,6 +1,5 @@
 package io.github.go.gerenciamento_adocoes.ong;
 
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,11 +10,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.github.go.gerenciamento_adocoes.common.pagination.Paginacao;
 import io.github.go.gerenciamento_adocoes.ong.dto.OngForm;
 import io.github.go.gerenciamento_adocoes.ong.dto.OngDetalhes;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
@@ -39,12 +42,15 @@ public class OngController {
 
     @GetMapping
     @Operation(
-            summary = "Listar todos as ongs",
-            description = "Retorna a lista de todos as ongs cadastradas"
+            summary = "Listar as ongs",
+            description = "Retorna todas as ongs cadastradas ou, com page/size, uma página delas"
     )
-    public ResponseEntity<List<OngDetalhes>> listarTodos(){
-        List<OngDetalhes> ongs = service.listarTodos();
-        return ResponseEntity.ok(ongs);
+    @ApiResponse(responseCode = "200", description = Paginacao.DESCRICAO_RESPOSTA)
+    public ResponseEntity<?> listarTodos(
+            @Parameter(description = Paginacao.DESCRICAO_PAGE) @RequestParam(required = false) Integer page,
+            @Parameter(description = Paginacao.DESCRICAO_SIZE) @RequestParam(required = false) Integer size
+    ){
+        return Paginacao.responder(page, size, service::listarPagina, service::listarTodos);
     }
 
     @GetMapping("{id}")
@@ -63,8 +69,7 @@ public class OngController {
             description = "Atualiza os dados de uma ong específica"
     )
     public ResponseEntity<OngDetalhes> atualizar(@PathVariable Long id, @RequestBody @Valid OngForm ongAtualizado){
-        service.atualizar(id, ongAtualizado);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(service.atualizar(id, ongAtualizado));
     }
 
     @DeleteMapping("{id}")

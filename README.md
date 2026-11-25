@@ -25,3 +25,14 @@ Para parar o banco sem apagar os dados:
 ```powershell
 docker compose stop db
 ```
+
+## Paginação das listagens
+
+`GET /ongs`, `/animais`, `/adotantes` e `/adocoes` aceitam paginação opcional:
+
+- Sem parâmetros, devolvem um array com todos os registros (usado nos selects do cadastro de adoção).
+- Com `page` (começa em 0) e/ou `size` (1 a 100, padrão 20), devolvem uma página ordenada por id:
+
+```json
+{ "content": [ ... ], "page": 0, "size": 20, "totalElements": 137, "totalPages": 7 }
+```

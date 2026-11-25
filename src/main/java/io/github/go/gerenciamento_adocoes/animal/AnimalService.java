@@ -2,6 +2,8 @@ package io.github.go.gerenciamento_adocoes.animal;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import io.github.go.gerenciamento_adocoes.animal.dto.AnimalDetalhes;
@@ -48,6 +50,10 @@ public class AnimalService {
                 .toList();
     }
 
+    public Page<AnimalDetalhes> listarPagina(Pageable pageable) {
+        return repository.findAll(pageable).map(mapper::toDetalhes);
+    }
+
     public AnimalDetalhes obterDetalhes(Long id){
         return repository.findById(id)
                 .map(mapper::toDetalhes)
@@ -55,7 +61,7 @@ public class AnimalService {
     }
 
     @Transactional
-    public void atualizar(Long id, AnimalForm animalAtualizado){
+    public AnimalDetalhes atualizar(Long id, AnimalForm animalAtualizado){
         var entity = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException());
 
@@ -64,6 +70,7 @@ public class AnimalService {
             throw new ValidationException(result.getCamposInvalidos());
         }
         mapper.updateEntity(entity, animalAtualizado);
+        return mapper.toDetalhes(entity);
     }
 
     @Transactional
