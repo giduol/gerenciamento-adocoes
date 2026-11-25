@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import io.github.go.gerenciamento_adocoes.acompanhamento.AcompanhamentoRepository;
 import io.github.go.gerenciamento_adocoes.adotante.AdotanteRepository;
 import io.github.go.gerenciamento_adocoes.animal.AnimalRepository;
 import io.github.go.gerenciamento_adocoes.adocao.dto.AdocaoDetalhes;
@@ -37,6 +38,9 @@ public class AdocaoService {
 
     @Autowired
     private AdotanteRepository adotanteRepository;
+
+    @Autowired
+    private AcompanhamentoRepository acompanhamentoRepository;
 
     @Transactional
     public AdocaoDetalhes criar(AdocaoForm form){
@@ -110,6 +114,15 @@ public class AdocaoService {
                 .map(AdocaoEntity::getAdoptionDocument)
                 .filter(document -> document.length > 0)
                 .orElseThrow(ResourceNotFoundException::new);
+    }
+
+    @Transactional
+    public void excluir(Long id) {
+        if (!repository.existsById(id)) {
+            throw new ResourceNotFoundException();
+        }
+        acompanhamentoRepository.deleteByAdoptionId(id);
+        repository.deleteById(id);
     }
 
     private byte[] readDocument(MultipartFile document) {

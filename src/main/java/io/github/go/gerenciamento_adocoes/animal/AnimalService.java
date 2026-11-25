@@ -8,6 +8,8 @@ import io.github.go.gerenciamento_adocoes.animal.dto.AnimalDetalhes;
 import io.github.go.gerenciamento_adocoes.animal.dto.AnimalForm;
 import io.github.go.gerenciamento_adocoes.animal.mapper.AnimalMapper;
 import io.github.go.gerenciamento_adocoes.animal.model.AnimalEntity;
+import io.github.go.gerenciamento_adocoes.adocao.AdocaoRepository;
+import io.github.go.gerenciamento_adocoes.common.exceptions.DatabaseException;
 import io.github.go.gerenciamento_adocoes.common.exceptions.ResourceNotFoundException;
 import io.github.go.gerenciamento_adocoes.common.exceptions.ValidationException;
 import jakarta.transaction.Transactional;
@@ -23,6 +25,9 @@ public class AnimalService {
 
     @Autowired
     private AnimalMapper mapper;
+
+    @Autowired
+    private AdocaoRepository adocaoRepository;
 
     public AnimalDetalhes criar(AnimalForm form){
         var result = validator.validar(form, null);
@@ -59,5 +64,16 @@ public class AnimalService {
             throw new ValidationException(result.getCamposInvalidos());
         }
         mapper.updateEntity(entity, animalAtualizado);
+    }
+
+    @Transactional
+    public void excluir(Long id){
+        if(!repository.existsById(id)) {
+            throw new ResourceNotFoundException();
+        }
+        if(adocaoRepository.existsByAnimalId(id)) {
+            throw new DatabaseException("Não é possível excluir: existem adoções vinculadas a este animal.");
+        }
+        repository.deleteById(id);
     }
 }
