@@ -11,5 +11,18 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data
 
+  # Testes de performance (k6). Só sobe quando chamado explicitamente:
+  #   docker compose run --rm k6 run cenarios/smoke.js
+  k6:
+    image: grafana/k6:latest
+    profiles: ["performance"]
+    working_dir: /performance
+    volumes:
+      - ./performance:/performance
+    environment:
+      BASE_URL: ${K6_BASE_URL:-http://host.docker.internal:8080}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
 volumes:
   db-data:

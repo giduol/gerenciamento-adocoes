@@ -36,3 +36,11 @@ docker compose stop db
 ```json
 { "content": [ ... ], "page": 0, "size": 20, "totalElements": 137, "totalPages": 7 }
 ```
+
+## Testes de performance
+
+Há scripts k6 em [`performance/`](performance/README.md). Com a API rodando localmente:
+
+```powershell
+docker compose run --rm k6 run cenarios/smoke.js
+```
