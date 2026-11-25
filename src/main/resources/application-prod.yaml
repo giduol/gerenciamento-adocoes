@@ -25,7 +25,9 @@ spring:
           lob:
             non_contextual_creation: true
     hibernate:
-      ddl-auto: none
+      # Em produção fica "none". Localmente o .env define DDL_AUTO=update
+      # para o Hibernate criar as tabelas no banco do docker compose.
+      ddl-auto: ${DDL_AUTO:none}
     show_sql: false
     open-in-view: false
 
