@@ -1,6 +1,5 @@
 package io.github.go.gerenciamento_adocoes.animal;
 
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,10 +10,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import io.github.go.gerenciamento_adocoes.animal.dto.AnimalDetalhes;
 import io.github.go.gerenciamento_adocoes.animal.dto.AnimalForm;
+import io.github.go.gerenciamento_adocoes.common.pagination.Paginacao;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
@@ -38,12 +41,15 @@ public class AnimalController {
 
     @GetMapping
     @Operation(
-            summary = "Listar todos os animais",
-            description = "Retorna a lista de todos os animais cadastrados"
+            summary = "Listar os animais",
+            description = "Retorna todos os animais cadastrados ou, com page/size, uma página deles"
     )
-    public ResponseEntity<List<AnimalDetalhes>> listarTodos(){
-        List<AnimalDetalhes> animais = service.listarTodos();
-        return ResponseEntity.ok(animais);
+    @ApiResponse(responseCode = "200", description = Paginacao.DESCRICAO_RESPOSTA)
+    public ResponseEntity<?> listarTodos(
+            @Parameter(description = Paginacao.DESCRICAO_PAGE) @RequestParam(required = false) Integer page,
+            @Parameter(description = Paginacao.DESCRICAO_SIZE) @RequestParam(required = false) Integer size
+    ){
+        return Paginacao.responder(page, size, service::listarPagina, service::listarTodos);
     }
 
     @GetMapping("{id}")
@@ -62,8 +68,7 @@ public class AnimalController {
             description = "Atualiza os dados de um animal específico"
     )
     public ResponseEntity<AnimalDetalhes> atualizar(@PathVariable Long id, @RequestBody @Valid AnimalForm animalAtualizado){
-        service.atualizar(id, animalAtualizado);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(service.atualizar(id, animalAtualizado));
     }
 
     @DeleteMapping("{id}")

@@ -2,6 +2,8 @@ package io.github.go.gerenciamento_adocoes.ong;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import io.github.go.gerenciamento_adocoes.ong.dto.OngDetalhes;
 import io.github.go.gerenciamento_adocoes.ong.dto.OngForm;
@@ -47,6 +49,10 @@ public class OngService {
                 .toList();
     }
 
+    public Page<OngDetalhes> listarPagina(Pageable pageable) {
+        return repository.findAll(pageable).map(mapper::toDetalhes);
+    }
+
     public OngDetalhes obterDetalhes(Long id){
         return repository.findById(id)
                 .map(mapper::toDetalhes)
@@ -54,7 +60,7 @@ public class OngService {
     }
 
     @Transactional
-    public void atualizar(Long id, OngForm ongAtualizado){
+    public OngDetalhes atualizar(Long id, OngForm ongAtualizado){
         var entity = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException());
 
@@ -63,6 +69,7 @@ public class OngService {
             throw new ValidationException(result.getCamposInvalidos());
         }
         mapper.updateEntity(entity, ongAtualizado);
+        return mapper.toDetalhes(entity);
     }
 
     @Transactional

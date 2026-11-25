@@ -2,6 +2,8 @@ package io.github.go.gerenciamento_adocoes.adotante;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import io.github.go.gerenciamento_adocoes.adotante.dto.AdotanteDetalhes;
 import io.github.go.gerenciamento_adocoes.adotante.dto.AdotanteForm;
@@ -47,6 +49,10 @@ public class AdotanteService {
                 .toList();
     }
 
+    public Page<AdotanteDetalhes> listarPagina(Pageable pageable) {
+        return repository.findAll(pageable).map(mapper::toDetalhes);
+    }
+
     public AdotanteDetalhes obterDetalhes(Long id){
         return repository.findById(id)
                 .map(mapper::toDetalhes)
@@ -54,7 +60,7 @@ public class AdotanteService {
     }
 
     @Transactional
-    public void atualizar(Long id, AdotanteForm adotanteAtualizado){
+    public AdotanteDetalhes atualizar(Long id, AdotanteForm adotanteAtualizado){
         var entity = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException());
 
@@ -63,6 +69,7 @@ public class AdotanteService {
             throw new ValidationException(result.getCamposInvalidos());
         }
         mapper.updateEntity(entity, adotanteAtualizado);
+        return mapper.toDetalhes(entity);
     }
 
     @Transactional

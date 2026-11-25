@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.io.IOException;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import io.github.go.gerenciamento_adocoes.acompanhamento.AcompanhamentoRepository;
@@ -76,6 +78,11 @@ public class AdocaoService {
     }
 
     @Transactional
+    public Page<AdocaoDetalhes> listarPagina(Pageable pageable) {
+        return repository.findAll(pageable).map(mapper::toDetalhes);
+    }
+
+    @Transactional
     public AdocaoDetalhes obterDetalhes(Long id){
         return repository.findById(id)
                 .map(mapper::toDetalhes)
@@ -83,12 +90,12 @@ public class AdocaoService {
     }
 
     @Transactional
-    public void atualizar(Long id, AdocaoForm adotanteAtualizado){
-        atualizar(id, adotanteAtualizado, null);
+    public AdocaoDetalhes atualizar(Long id, AdocaoForm adotanteAtualizado){
+        return atualizar(id, adotanteAtualizado, null);
     }
 
     @Transactional
-    public void atualizar(Long id, AdocaoForm adotanteAtualizado, MultipartFile document){
+    public AdocaoDetalhes atualizar(Long id, AdocaoForm adotanteAtualizado, MultipartFile document){
         var entity = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException());
         byte[] existingDocument = entity.getAdoptionDocument();
@@ -106,6 +113,7 @@ public class AdocaoService {
             entity.setAdoptionDocument(existingDocument);
         }
         associarEntidades(entity, adotanteAtualizado);
+        return mapper.toDetalhes(entity);
     }
 
     @Transactional
